@@ -7,8 +7,8 @@
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <!-- Chosen Palette: "Warm Neutral Harmony" -->
-    <!-- Application Structure Plan: The SPA is designed as an interactive dashboard centered around three key user tasks: Exploration, Comparison, and Detailed Analysis. The structure eschews the linear format of the source report for a more dynamic, user-driven flow. 1. **Header & Global Filters:** A persistent top bar contains the main title and primary filters (Program Category: MBA, MCA, MSc IT). This allows users to immediately narrow the entire dataset to their primary interest. 2. **Key Insights/Dashboard View (Default):** The main content area starts with two high-impact, interactive charts: a Return on Investment (ROI) scatter plot and a Fees vs. Average Package bar chart. This provides an immediate, visual summary of the most critical decision-making factors. This dashboard approach is chosen for usability because it presents the most powerful comparative insights upfront, enabling quick evaluation. 3. **College Listings Grid:** Below the charts, a dynamic grid displays individual college cards. This grid is filterable and sortable, allowing users to drill down from the high-level dashboard view. 4. **Detailed Modal View:** Clicking a college card opens a modal with comprehensive details, including program specifics, admission cutoffs, and recruiter lists. This prevents cluttering the main view and provides deep information on demand. This layered structure (Global Filters -> Dashboard -> Grid -> Modal) guides the user from a broad overview to specific details logically and efficiently. -->
-    <!-- Visualization & Content Choices: The visualizations are chosen to directly support the application's user-centric structure, with a strict adherence to NO SVG/Mermaid. 1. **ROI Analysis (Scatter Plot):** Report Info: Fees vs. Average Package. -> Goal: Show the relationship between cost and financial return. -> Viz Method: Interactive Scatter Plot (Chart.js). -> Interaction: Hovering over a point reveals the college name, ROI, fees, and package. Users can visually identify high-value outliers. -> Justification: A scatter plot is superior to a table for showing correlation and outliers in two-dimensional data. Library: Chart.js (Canvas). 2. **Cost vs. Outcome Comparison (Bar Chart):** Report Info: Fees and Average/Highest Packages. -> Goal: Compare the absolute costs and potential earnings across different colleges. -> Viz Method: Grouped Bar Chart (Chart.js). -> Interaction: Filters dynamically update the chart to show only relevant colleges. Tooltips provide precise values. -> Justification: Bar charts are excellent for direct, quantitative comparisons between multiple entities. Library: Chart.js (Canvas). 3. **Market Positioning (Implicit in Charts):** Report Info: Analysis of "High-ROI Public Elites" vs. "Premium Private Brands". -> Goal: Allow users to discover these segments organically. -> Presentation Method: The ROI and Cost charts are designed so these clusters become visually apparent without needing explicit labels. The user's interaction with the charts allows them to understand this nexus. -> Justification: This promotes active discovery over passive reading. Library: Chart.js (Canvas). 4. **College Details (Structured HTML):** Report Info: All specific data points for an institution. -> Goal: Provide comprehensive, organized information for a single institution. -> Presentation Method: A clean, well-structured layout within a modal using Tailwind CSS for typography and spacing. -> Interaction: Clicking a card triggers the modal. A prominent "Visit Website" link provides an external call to action. -> Justification: A modal view keeps the main dashboard clean while making deep-dive information readily accessible. Method: HTML/CSS/JS. -->
+    <!-- Application Structure Plan: The SPA is an interactive dashboard for exploring Indian postgraduate programs. The architecture is designed for a top-down, filter-driven user flow. 1. **Header & Global Filters:** A persistent top navigation bar contains primary filters for Program Category (MBA, MCA, MSc IT) and a new, crucial filter for State. Adding the State filter provides a vital geographical dimension, allowing users to target specific regions, which is a common and critical part of the college selection process. 2. **Interactive Dashboard:** The main view immediately presents two high-impact charts (ROI Scatter Plot, Fees vs. Package Bar Chart) that serve as a visual summary of the filtered data, enabling quick comparison. 3. **Dynamic College Grid:** Below the charts, a filterable grid displays college cards, offering more detail at a glance. 4. **Detailed Modal View:** Clicking a card opens a modal with comprehensive information, keeping the main interface clean while providing deep-dive data on demand. This layered structure (Program/State Filters -> Visual Dashboard -> Grid View -> Detailed Modal) is highly usable as it guides the user from broad exploration to specific analysis in a logical, intuitive sequence. -->
+    <!-- Visualization & Content Choices: Visualizations and content presentation are chosen to directly support the refined, dual-filter structure, with a strict adherence to NO SVG/Mermaid. 1. **ROI Analysis (Scatter Plot):** Report Info: Fees vs. Average Package. -> Goal: Show cost-benefit relationships. -> Viz Method: Interactive Scatter Plot (Chart.js). -> Interaction: Hovering reveals college details. The chart dynamically updates based on both Program and State filters, allowing for powerful regional ROI comparisons (e.g., comparing ROI for only MBA colleges in Maharashtra). -> Justification: A scatter plot is ideal for showing correlation and outliers in two-dimensional data. Library: Chart.js (Canvas). 2. **Cost vs. Outcome (Bar Chart):** Report Info: Fees and Average Packages. -> Goal: Compare absolute costs and earnings. -> Viz Method: Grouped Bar Chart (Chart.js). -> Interaction: Also updates with both Program and State filters. Tooltips show precise values. -> Justification: Bar charts excel at direct quantitative comparisons. Library: Chart.js (Canvas). 3. **State-wise Filtering (Dropdown):** Report Info: State data for each college. -> Goal: Enable geographical search. -> Presentation Method: A standard HTML `<select>` dropdown populated dynamically from the data. -> Interaction: Selecting a state filters the entire dataset, updating both charts and the college grid. -> Justification: A dropdown is the standard and most intuitive UI element for selecting from a long list of options like states. Method: HTML/JS. 4. **College Details (Structured HTML):** Report Info: All specific data points for an institution. -> Goal: Provide deep information on demand. -> Presentation Method: A clean modal layout. -> Interaction: Triggered by a click on a college card. -> Justification: A modal keeps the main dashboard uncluttered. Method: HTML/CSS/JS. -->
     <!-- CONFIRMATION: NO SVG graphics used. NO Mermaid JS used. -->
     <style>
         body {
@@ -51,23 +51,21 @@
         .nav-button:not(.active):hover {
             background-color: #F1E9DA; /* Light Beige */
         }
+        #state-filter {
+            -webkit-appearance: none;
+            -moz-appearance: none;
+            appearance: none;
+            background-image: url('data:image/svg+xml;charset=US-ASCII,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20width%3D%22292.4%22%20height%3D%22292.4%22%3E%3Cpath%20fill%3D%22%23A0522D%22%20d%3D%22M287%2069.4a17.6%2017.6%200%200%200-13-5.4H18.4c-5%200-9.3%201.8-12.9%205.4A17.6%2017.6%200%200%200%200%2082.2c0%205%201.8%209.3%205.4%2012.9l128%20127.9c3.6%203.6%207.8%205.4%2012.8%205.4s9.2-1.8%2012.8-5.4L287%2095c3.5-3.5%205.4-7.8%205.4-12.8%200-5-1.9-9.2-5.5-12.8z%22%2F%3E%3C%2Fsvg%3E');
+            background-repeat: no-repeat;
+            background-position: right 0.7rem center;
+            background-size: 0.65rem auto;
+        }
         .college-card {
             transition: transform 0.3s ease, box-shadow 0.3s ease;
         }
         .college-card:hover {
             transform: translateY(-5px);
             box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
-        }
-        .ad-placeholder {
-            background-color: #e9e9e9;
-            border: 2px dashed #ccc;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            text-align: center;
-            color: #888;
-            font-size: 1rem;
-            font-weight: 500;
         }
     </style>
     <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -79,42 +77,40 @@
     <div id="app" class="container mx-auto p-4 md:p-8">
         
         <header class="text-center mb-8">
-            <h1 class="text-4xl md:text-5xl font-bold text-[#A0522D]">Apna College Explorer</h1>
+            <h1 class="text-4xl md:text-5xl font-bold text-[#A0522D]">Indian Higher Education Explorer</h1>
             <p class="mt-2 text-lg text-gray-600">An Interactive Guide to Top MBA, MCA & MSc IT Colleges</p>
         </header>
 
-        <nav class="bg-[#F1E9DA] p-2 rounded-lg shadow-md mb-6 sticky top-4 z-40">
-            <div id="program-filters" class="flex justify-center items-center space-x-2 md:space-x-4">
-                 <button data-program="All" class="nav-button font-semibold py-2 px-4 rounded-md active">All Programs</button>
-                 <button data-program="MBA" class="nav-button font-semibold py-2 px-4 rounded-md">MBA</button>
-                 <button data-program="MCA" class="nav-button font-semibold py-2 px-4 rounded-md">MCA</button>
-                 <button data-program="MSc IT" class="nav-button font-semibold py-2 px-4 rounded-md">MSc IT</button>
+        <nav class="bg-[#F1E9DA] p-2 rounded-lg shadow-md mb-8 sticky top-4 z-40">
+            <div class="flex flex-col sm:flex-row justify-center items-center space-y-2 sm:space-y-0 sm:space-x-4">
+                <div id="program-filters" class="flex-shrink-0 flex justify-center items-center space-x-2 md:space-x-4">
+                     <button data-program="All" class="nav-button font-semibold py-2 px-3 sm:px-4 rounded-md text-sm sm:text-base active">All</button>
+                     <button data-program="MBA" class="nav-button font-semibold py-2 px-3 sm:px-4 rounded-md text-sm sm:text-base">MBA</button>
+                     <button data-program="MCA" class="nav-button font-semibold py-2 px-3 sm:px-4 rounded-md text-sm sm:text-base">MCA</button>
+                     <button data-program="MSc IT" class="nav-button font-semibold py-2 px-3 sm:px-4 rounded-md text-sm sm:text-base">MSc IT</button>
+                </div>
+                <div class="w-full sm:w-auto">
+                    <select id="state-filter" class="w-full sm:w-48 bg-white border border-gray-300 text-gray-700 py-2 px-3 rounded-md leading-tight focus:outline-none focus:bg-white focus:border-gray-500 font-semibold cursor-pointer">
+                        <option value="All">All States</option>
+                    </select>
+                </div>
             </div>
         </nav>
         
-        <!-- AdSense Leaderboard Ad Slot -->
-        <div class="my-6">
-            <div class="ad-placeholder mx-auto" style="width: 728px; height: 90px;">
-                <!-- Paste Google AdSense Leaderboard (728x90) code here -->
-                Leaderboard Ad
-            </div>
-        </div>
-
-
         <main id="content-area">
             
             <section id="charts-section" class="mb-12">
                 <div class="grid grid-cols-1 lg:grid-cols-2 gap-8">
-                    <div class="bg-white p-6 rounded-lg shadow-lg">
-                        <h2 class="text-2xl font-bold text-center mb-4 text-[#A0522D]">Return on Investment (ROI) Analysis</h2>
-                        <p class="text-center text-gray-600 mb-4 text-sm">This chart plots each college's average salary package against its fees. Colleges in the top-left quadrant offer the highest return on investment.</p>
+                    <div class="bg-white p-4 sm:p-6 rounded-lg shadow-lg">
+                        <h2 class="text-xl sm:text-2xl font-bold text-center mb-4 text-[#A0522D]">Return on Investment (ROI) Analysis</h2>
+                        <p class="text-center text-gray-600 mb-4 text-sm">This chart plots each college's average salary against its fees. Colleges in the top-left offer the highest return.</p>
                         <div class="chart-container">
                             <canvas id="roiChart"></canvas>
                         </div>
                     </div>
-                    <div class="bg-white p-6 rounded-lg shadow-lg">
-                        <h2 class="text-2xl font-bold text-center mb-4 text-[#A0522D]">Fees vs. Placement Package</h2>
-                        <p class="text-center text-gray-600 mb-4 text-sm">Compare the total fees (light brown) against the average placement package (dark brown) for each institution.</p>
+                    <div class="bg-white p-4 sm:p-6 rounded-lg shadow-lg">
+                        <h2 class="text-xl sm:text-2xl font-bold text-center mb-4 text-[#A0522D]">Fees vs. Placement Package</h2>
+                        <p class="text-center text-gray-600 mb-4 text-sm">Compare total fees (light brown) against the average placement package (dark brown).</p>
                         <div class="chart-container">
                             <canvas id="feesVsPackageChart"></canvas>
                         </div>
@@ -125,18 +121,9 @@
             <section id="colleges-section">
                  <h2 class="text-3xl font-bold text-center mb-6 text-[#A0522D]">Explore Colleges</h2>
                  <div id="college-grid" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
-                    </div>
+                 </div>
             </section>
         </main>
-        
-        <footer class="mt-16 pt-8 border-t border-gray-300 text-center">
-            <div class="flex justify-center space-x-6">
-                <a href="#" id="about-link" class="text-gray-600 hover:text-[#A0522D] font-medium">About Us</a>
-                <a href="#" id="contact-link" class="text-gray-600 hover:text-[#A0522D] font-medium">Contact Us</a>
-                <a href="#" id="privacy-link" class="text-gray-600 hover:text-[#A0522D] font-medium">Privacy Policy</a>
-            </div>
-            <p class="mt-4 text-sm text-gray-500">&copy; 2024 Apna College Explorer. All Rights Reserved.</p>
-        </footer>
     </div>
 
     <div id="college-modal" class="fixed inset-0 bg-black bg-opacity-60 hidden items-center justify-center p-4 z-50">
@@ -148,322 +135,121 @@
 
     <script>
         const collegeData = [
-            {
-                "institute_name": "Jamnalal Bajaj Institute of Management Studies",
-                "acronym": "JBIMS",
-                "location": {"city": "Mumbai", "state": "Maharashtra"},
-                "establishment_year": 1965, "institute_type": "Public", "website": "https://www.jbims.edu/",
-                "accreditations": ["AACSB"],
-                "nirf_ranking": [{"year": 2023, "category": "Management", "rank": 10}],
-                "programs": [{
-                    "program_category": "MBA", "degree_name": "Masters in Management Studies (MMS)",
-                    "fees": {"amount_inr": 700000, "details": "Highly subsidized fees."},
-                    "admissions": {
-                        "seat_intake": 120,
-                        "admission_process_summary": "Admission through DTE Maharashtra's Centralized Admission Process (CAP) based on CAT/CMAT scores.",
-                        "entrance_exams": [
-                            {"exam_name": "CMAT", "cutoff": [{"category": "All", "value": "99.9+", "unit": "Percentile"}]},
-                            {"exam_name": "CAT", "cutoff": [{"category": "All", "value": "98+", "unit": "Percentile"}]}
-                        ],
-                        "application_deadlines": "Typically aligns with DTE Maharashtra CAP schedule, around June-July."
-                    },
-                    "placements": { "year": "2022-24", "average_package_lpa": 28.02, "highest_package_lpa": 35.75, "median_package_lpa": 27.60, "key_recruiters": ["McKinsey & Company", "BCG", "Goldman Sachs", "HUL", "P&G"], "placement_report_url": "https://www.jbims.edu/placement-reports" }
-                }]
-            },
-            {
-                "institute_name": "Goa Institute of Management", "acronym": "GIM", "location": {"city": "Sanquelim", "state": "Goa"},
-                "establishment_year": 1993, "institute_type": "Private", "website": "https://gim.ac.in/", "accreditations": ["AMBA", "AACSB"],
-                "nirf_ranking": [{"year": 2023, "category": "Management", "rank": 36}],
-                "programs": [{
-                    "program_category": "MBA", "degree_name": "Post Graduate Diploma in Management (PGDM)",
-                    "fees": {"amount_inr": 2040000},
-                    "admissions": {
-                        "seat_intake": 480,
-                        "admission_process_summary": "Holistic profile-based selection including academic record, work experience, and entrance exam scores.",
-                        "entrance_exams": [
-                            {"exam_name": "CMAT", "cutoff": [{"category": "All", "value": "95-99", "unit": "Percentile"}]},
-                             {"exam_name": "XAT", "cutoff": [{"category": "All", "value": "85-90", "unit": "Percentile"}]}
-                        ],
-                        "application_deadlines": "Final closure of applications is typically in early January."
-                    },
-                    "placements": {"year": "2022-24", "average_package_lpa": 14.7, "highest_package_lpa": 32.2, "median_package_lpa": 14.3, "key_recruiters": ["Deloitte", "ITC", "Accenture", "ICICI Bank", "Gartner"], "placement_report_url": "https://gim.ac.in/placements/placement-reports"}
-                }]
-            },
-            {
-                "institute_name": "Great Lakes Institute of Management, Chennai", "acronym": "GLIM Chennai", "location": {"city": "Chennai", "state": "Tamil Nadu"},
-                "establishment_year": 2004, "institute_type": "Private", "website": "https://www.greatlakes.edu.in/chennai/", "accreditations": ["AMBA", "SAQS"],
-                "nirf_ranking": [{"year": 2023, "category": "Management", "rank": 31}],
-                "programs": [{
-                    "program_category": "MBA", "degree_name": "Post Graduate Diploma in Management (PGDM)",
-                    "fees": {"amount_inr": 2080000},
-                    "admissions": {
-                        "seat_intake": 180,
-                        "admission_process_summary": "Accepts GMAT, CAT, XAT & CMAT scores. Two cycles of application.",
-                        "entrance_exams": [ {"exam_name": "CMAT", "cutoff": [{"category": "All", "value": "95+", "unit": "Percentile"}]} ],
-                        "application_deadlines": "Application cycles typically close in March/April."
-                    },
-                    "placements": {"year": "2022-24", "average_package_lpa": 14.5, "highest_package_lpa": 46.0, "median_package_lpa": 14.8, "key_recruiters": ["Bain", "ZS Associates", "TCS", "HCL", "JP Morgan"], "placement_report_url": "https://www.greatlakes.edu.in/chennai/placements"}
-                }]
-            },
-            {
-                "institute_name": "Sydenham Institute of Management Studies, Research and Entrepreneurship Education", "acronym": "SIMSREE",
-                "location": {"city": "Mumbai", "state": "Maharashtra"}, "establishment_year": 1983, "institute_type": "Public",
-                "website": "https://www.simsree.org/", "accreditations": [], "nirf_ranking": [],
-                "programs": [{
-                    "program_category": "MBA", "degree_name": "Masters in Management Studies (MMS)",
-                    "fees": {"amount_inr": 153000},
-                    "admissions": {
-                        "seat_intake": 120,
-                        "admission_process_summary": "Admission via DTE Maharashtra CAP based on CAT/CMAT.",
-                        "entrance_exams": [{"exam_name": "CMAT", "cutoff": [{"category": "All", "value": "99.9+", "unit": "Percentile"}]}],
-                        "application_deadlines": "Follows DTE Maharashtra CAP schedule."
-                    },
-                    "placements": {"year": "2022-24", "average_package_lpa": 15.19, "highest_package_lpa": 21.53, "median_package_lpa": 14.80, "key_recruiters": ["JP Morgan Chase", "CRISIL", "EY", "Capgemini", "Aditya Birla Capital"], "placement_report_url": "https://simsree.org/placements"}
-                }]
-            },
-            {
-                "institute_name": "Symbiosis Institute of Business Management, Pune", "acronym": "SIBM Pune", "location": {"city": "Pune", "state": "Maharashtra"},
-                "establishment_year": 1978, "institute_type": "Private", "website": "https://www.sibm.edu/", "accreditations": ["NAAC A++"],
-                "nirf_ranking": [{"year": 2023, "category": "Management", "rank": 17}],
-                "programs": [{
-                    "program_category": "MBA", "degree_name": "Master of Business Administration (MBA)",
-                    "fees": {"amount_inr": 2459000},
-                    "admissions": {
-                        "seat_intake": 180,
-                        "admission_process_summary": "Admission is based on SNAP test scores, followed by Group Exercise, Personal Interview & Written Ability Test.",
-                        "entrance_exams": [{"exam_name": "SNAP", "cutoff": [{"category": "All", "value": "98+", "unit": "Percentile"}]}],
-                        "application_deadlines": "SNAP registration typically closes in November."
-                    },
-                    "placements": {"year": "2022-24", "average_package_lpa": 28.16, "highest_package_lpa": 35.05, "median_package_lpa": 25.00, "key_recruiters": ["Bain", "Amazon", "Flipkart", "Coca-Cola", "Asian Paints"], "placement_report_url": "https://sibm.edu/placement-report"}
-                }]
-            },
-            {
-                "institute_name": "National Institute of Technology, Tiruchirappalli", "acronym": "NIT Trichy", "location": {"city": "Tiruchirappalli", "state": "Tamil Nadu"},
-                "establishment_year": 1964, "institute_type": "Public", "website": "https://www.nitt.edu/", "accreditations": [],
-                "nirf_ranking": [{"year": 2023, "category": "Overall", "rank": 9}],
-                "programs": [{
-                    "program_category": "MCA", "degree_name": "Master of Computer Applications",
-                    "fees": {"amount_inr": 280000},
-                    "admissions": {
-                        "seat_intake": 115,
-                        "admission_process_summary": "Admission through the national-level NIMCET exam.",
-                        "entrance_exams": [{"exam_name": "NIMCET", "cutoff": [{"category": "All", "value": "Top 50", "unit": "Rank"}]}],
-                        "application_deadlines": "NIMCET registration typically ends in May."
-                    },
-                    "placements": {"year": "2022-24", "average_package_lpa": 12.0, "highest_package_lpa": 40.0, "median_package_lpa": 11.5, "key_recruiters": ["Microsoft", "Oracle", "Qualcomm", "SAP Labs", "CISCO"], "placement_report_url": "https://www.nitt.edu/academics/departments/ca/placements/mca/"}
-                }]
-            },
-            {
-                "institute_name": "Dhirubhai Ambani Institute of Information and Communication Technology", "acronym": "DA-IICT", "location": {"city": "Gandhinagar", "state": "Gujarat"},
-                "establishment_year": 2001, "institute_type": "State Private University", "website": "https://www.daiict.ac.in/", "accreditations": ["NAAC A++"], "nirf_ranking": [],
-                "programs": [{
-                    "program_category": "MSc IT", "degree_name": "M.Sc. (Information Technology)",
-                    "fees": {"amount_inr": 520000},
-                    "admissions": {
-                        "seat_intake": 120,
-                        "admission_process_summary": "Admission is based on merit in the qualifying examination and scores from an entrance test.",
-                        "entrance_exams": [{"exam_name": "DA-IICT Entrance", "cutoff": []}],
-                        "application_deadlines": "Entrance test is typically held in June."
-                    },
-                    "placements": {"year": "2022-24", "average_package_lpa": 14.5, "highest_package_lpa": 52.0, "median_package_lpa": 13.0, "key_recruiters": ["Google", "Amazon", "Sprinklr", "Goldman Sachs", "DE Shaw"], "placement_report_url": "https://www.daiict.ac.in/placements"}
-                }]
-            },
-            {
-                "institute_name": "Veermata Jijabai Technological Institute", "acronym": "VJTI", "location": {"city": "Mumbai", "state": "Maharashtra"},
-                "establishment_year": 1887, "institute_type": "Public", "website": "https://vjti.ac.in/", "accreditations": ["NAAC"], "nirf_ranking": [],
-                "programs": [{
-                    "program_category": "MCA", "degree_name": "Master of Computer Applications",
-                    "fees": {"amount_inr": 180000},
-                    "admissions": {
-                        "seat_intake": 60,
-                        "admission_process_summary": "Admission through MAH MCA CET.",
-                        "entrance_exams": [{"exam_name": "MAH MCA CET", "cutoff": [{"category": "All", "value": "99.7+", "unit": "Percentile"}]}],
-                        "application_deadlines": "Follows MAH MCA CET schedule."
-                    },
-                    "placements": {"year": "2022-24", "average_package_lpa": 8.0, "highest_package_lpa": 20.0, "median_package_lpa": 7.5, "key_recruiters": ["Infosys", "TCS", "Wipro", "L&T Infotech", "Oracle"], "placement_report_url": "https://vjti.ac.in/training-and-placement-office/"}
-                }]
-            }
+            { "id": 1, "institute_name": "IIM Ahmedabad", "program_category": "MBA", "city": "Ahmedabad", "state": "Gujarat", "ownership": "Public", "nirf_rank": 1, "fees_lakh": 25.0, "avg_pkg_lpa": 31.58, "exams": "CAT, GMAT, GRE", "website": "https://www.iima.ac.in/" },
+            { "id": 2, "institute_name": "IIM Bangalore", "program_category": "MBA", "city": "Bengaluru", "state": "Karnataka", "ownership": "Public", "nirf_rank": 2, "fees_lakh": 24.5, "avg_pkg_lpa": 32.50, "exams": "CAT, GMAT, GRE", "website": "https://www.iim-b.ac.in/" },
+            { "id": 3, "institute_name": "IIM Kozhikode", "program_category": "MBA", "city": "Kozhikode", "state": "Kerala", "ownership": "Public", "nirf_rank": 3, "fees_lakh": 20.5, "avg_pkg_lpa": 28.05, "exams": "CAT, GMAT, GRE", "website": "https://www.iimk.ac.in/" },
+            { "id": 4, "institute_name": "IIT Delhi", "program_category": "MBA", "city": "New Delhi", "state": "Delhi", "ownership": "Public", "nirf_rank": 4, "fees_lakh": 11.2, "avg_pkg_lpa": 20.06, "exams": "CAT", "website": "https://dms.iitd.ac.in/" },
+            { "id": 5, "institute_name": "IIM Calcutta", "program_category": "MBA", "city": "Kolkata", "state": "West Bengal", "ownership": "Public", "nirf_rank": 5, "fees_lakh": 25.0, "avg_pkg_lpa": 31.05, "exams": "CAT, GMAT, GRE", "website": "https://www.iimcal.ac.in/" },
+            { "id": 6, "institute_name": "IIM Mumbai (NITIE)", "program_category": "MBA", "city": "Mumbai", "state": "Maharashtra", "ownership": "Public", "nirf_rank": 6, "fees_lakh": 9.0, "avg_pkg_lpa": 26.0, "exams": "CAT", "website": "https://www.iimmumbai.ac.in/" },
+            { "id": 7, "institute_name": "IIM Lucknow", "program_category": "MBA", "city": "Lucknow", "state": "Uttar Pradesh", "ownership": "Public", "nirf_rank": 7, "fees_lakh": 13.0, "avg_pkg_lpa": 30.0, "exams": "CAT, GMAT, GRE", "website": "https://www.iiml.ac.in/" },
+            { "id": 8, "institute_name": "IIM Indore", "program_category": "MBA", "city": "Indore", "state": "Madhya Pradesh", "ownership": "Public", "nirf_rank": 8, "fees_lakh": 20.63, "avg_pkg_lpa": 25.68, "exams": "CAT, GMAT, GRE", "website": "https://www.iimidr.ac.in/" },
+            { "id": 9, "institute_name": "XLRI Jamshedpur", "program_category": "MBA", "city": "Jamshedpur", "state": "Jharkhand", "ownership": "Private", "nirf_rank": 9, "fees_lakh": 28.6, "avg_pkg_lpa": 28.0, "exams": "XAT, GMAT, GRE", "website": "https://www.xlri.ac.in/" },
+            { "id": 10, "institute_name": "IIT Bombay (SJMSOM)", "program_category": "MBA", "city": "Mumbai", "state": "Maharashtra", "ownership": "Public", "nirf_rank": 10, "fees_lakh": 11.35, "avg_pkg_lpa": 26.64, "exams": "CAT, MAH CET", "website": "https://www.som.iitb.ac.in/" },
+            { "id": 11, "institute_name": "MDI Gurgaon", "program_category": "MBA", "city": "Gurgaon", "state": "Haryana", "ownership": "Private", "nirf_rank": 11, "fees_lakh": 26.0, "avg_pkg_lpa": 26.0, "exams": "CAT", "website": "https://www.mdi.ac.in/" },
+            { "id": 12, "institute_name": "SIBM Pune", "program_category": "MBA", "city": "Pune", "state": "Maharashtra", "ownership": "Private", "nirf_rank": 13, "fees_lakh": 24.2, "avg_pkg_lpa": 25.0, "exams": "SNAP, MAH CET", "website": "https://www.sibm.edu/" },
+            { "id": 13, "institute_name": "SPJIMR Mumbai", "program_category": "MBA", "city": "Mumbai", "state": "Maharashtra", "ownership": "Private", "nirf_rank": 20, "fees_lakh": 24.0, "avg_pkg_lpa": 32.0, "exams": "CAT, GMAT", "website": "https://www.spjimr.org/" },
+            { "id": 14, "institute_name": "NMIMS Mumbai", "program_category": "MBA", "city": "Mumbai", "state": "Maharashtra", "ownership": "Private", "nirf_rank": 21, "fees_lakh": 10.0, "avg_pkg_lpa": 13.0, "exams": "NMAT, MAH CET", "website": "https://www.nmims.edu/" },
+            { "id": 15, "institute_name": "Great Lakes, Chennai", "program_category": "MBA", "city": "Chennai", "state": "Tamil Nadu", "ownership": "Private", "nirf_rank": 34, "fees_lakh": 12.0, "avg_pkg_lpa": 11.0, "exams": "CAT, XAT, CMAT", "website": "https://www.greatlakes.edu.in/" },
+            { "id": 16, "institute_name": "GIM Goa", "program_category": "MBA", "city": "Sanquelim", "state": "Goa", "ownership": "Private", "nirf_rank": 37, "fees_lakh": 18.31, "avg_pkg_lpa": 14.87, "exams": "CAT, XAT, CMAT, GMAT", "website": "https://www.gim.ac.in/" },
+            { "id": 17, "institute_name": "K J Somaiya, Mumbai", "program_category": "MBA", "city": "Mumbai", "state": "Maharashtra", "ownership": "Private", "nirf_rank": 63, "fees_lakh": 21.34, "avg_pkg_lpa": 12.0, "exams": "CAT, XAT, CMAT, NMAT", "website": "https://www.somaiya.edu/kjsim/" },
+            { "id": 18, "institute_name": "NIT Trichy", "program_category": "MCA", "city": "Tiruchirappalli", "state": "Tamil Nadu", "ownership": "Public", "nirf_rank": 9, "fees_lakh": 2.1, "avg_pkg_lpa": 12.37, "exams": "NIMCET", "website": "https://www.nitt.edu/" },
+            { "id": 19, "institute_name": "NIT Surathkal", "program_category": "MCA", "city": "Surathkal", "state": "Karnataka", "ownership": "Public", "nirf_rank": 17, "fees_lakh": 2.0, "avg_pkg_lpa": 7.0, "exams": "NIMCET", "website": "https://www.nitk.ac.in/" },
+            { "id": 20, "institute_name": "NIT Warangal", "program_category": "MCA", "city": "Warangal", "state": "Telangana", "ownership": "Public", "nirf_rank": 21, "fees_lakh": 1.4, "avg_pkg_lpa": 10.0, "exams": "NIMCET", "website": "https://www.nitw.ac.in/" },
+            { "id": 21, "institute_name": "VIT Vellore", "program_category": "MCA", "city": "Vellore", "state": "Tamil Nadu", "ownership": "Private", "nirf_rank": 10, "fees_lakh": 2.74, "avg_pkg_lpa": 8.0, "exams": "VITMEE", "website": "https://www.vit.ac.in/" },
+            { "id": 22, "institute_name": "JNU, Delhi", "program_category": "MCA", "city": "New Delhi", "state": "Delhi", "ownership": "Public", "nirf_rank": 2, "fees_lakh": 0.01, "avg_pkg_lpa": 10.0, "exams": "CUET-PG", "website": "https://www.jnu.ac.in/" },
+            { "id": 23, "institute_name": "Delhi University", "program_category": "MCA", "city": "New Delhi", "state": "Delhi", "ownership": "Public", "nirf_rank": 6, "fees_lakh": 0.01, "avg_pkg_lpa": 16.0, "exams": "CUET-PG", "website": "https://www.du.ac.in/" },
+            { "id": 24, "institute_name": "VJTI Mumbai", "program_category": "MCA", "city": "Mumbai", "state": "Maharashtra", "ownership": "Public", "nirf_rank": 104, "fees_lakh": 0.3, "avg_pkg_lpa": 7.0, "exams": "MAH MCA CET", "website": "https://www.vjti.ac.in/" },
+            { "id": 25, "institute_name": "Christ University", "program_category": "MCA", "city": "Bengaluru", "state": "Karnataka", "ownership": "Private", "nirf_rank": 101, "fees_lakh": 4.38, "avg_pkg_lpa": 6.1, "exams": "Karnataka PGCET, KMAT", "website": "https://christuniversity.in/" },
+            { "id": 26, "institute_name": "DA-IICT", "program_category": "MSc IT", "city": "Gandhinagar", "state": "Gujarat", "ownership": "Private", "nirf_rank": 1, "fees_lakh": 3.3, "avg_pkg_lpa": 14.5, "exams": "Institute Entrance Test", "website": "https://www.daiict.ac.in/" },
+            { "id": 27, "institute_name": "IIT Bombay", "program_category": "MSc IT", "city": "Mumbai", "state": "Maharashtra", "ownership": "Public", "nirf_rank": 3, "fees_lakh": 0.4, "avg_pkg_lpa": 20.0, "exams": "IIT JAM", "website": "https://www.iitb.ac.in/" },
+            { "id": 28, "institute_name": "University of Madras", "program_category": "MSc IT", "city": "Chennai", "state": "Tamil Nadu", "ownership": "Public", "nirf_rank": 47, "fees_lakh": 0.53, "avg_pkg_lpa": 5.0, "exams": "TANCET/Merit", "website": "https://www.unom.ac.in/" },
+            { "id": 29, "institute_name": "Loyola College", "program_category": "MSc IT", "city": "Chennai", "state": "Tamil Nadu", "ownership": "Private", "nirf_rank": 7, "fees_lakh": 2.0, "avg_pkg_lpa": 6.0, "exams": "TANCET/Merit", "website": "https://www.loyolacollege.edu/" },
+            { "id": 30, "institute_name": "St. Xavier's College, Mumbai", "program_category": "MSc IT", "city": "Mumbai", "state": "Maharashtra", "ownership": "Private", "nirf_rank": 5, "fees_lakh": 0.16, "avg_pkg_lpa": 7.5, "exams": "University Entrance Test", "website": "https://xaviers.edu/" }
         ];
-
 
         let roiChart, feesVsPackageChart;
         let currentProgram = 'All';
+        let currentState = 'All';
 
         const renderCollegeCard = (college) => {
-            const program = college.programs[0];
-            const roi = (program.placements.average_package_lpa * 100000) / program.fees.amount_inr;
+            const roi = college.fees_lakh > 0 ? (college.avg_pkg_lpa / college.fees_lakh) : Infinity;
             return `
-                <div class="college-card bg-white rounded-lg shadow-md p-5 flex flex-col cursor-pointer" data-college-id="${college.acronym}">
+                <div class="college-card bg-white rounded-lg shadow-md p-5 flex flex-col cursor-pointer" data-college-id="${college.id}">
                     <div class="flex-grow">
                         <div class="flex justify-between items-start">
-                             <h3 class="text-xl font-bold text-[#A0522D]">${college.acronym}</h3>
-                             <span class="text-sm font-semibold text-gray-500 bg-gray-100 px-2 py-1 rounded-full">${program.program_category}</span>
+                            <h3 class="text-lg font-bold text-[#A0522D] pr-2">${college.institute_name}</h3>
+                            <span class="flex-shrink-0 text-xs font-semibold text-gray-500 bg-gray-100 px-2 py-1 rounded-full">${college.program_category}</span>
                         </div>
-                        <p class="text-gray-600 text-sm mb-3">${college.location.city}, ${college.location.state}</p>
+                        <p class="text-gray-600 text-sm mb-3">${college.city}, ${college.state}</p>
                         <div class="space-y-2 text-sm">
-                            <p><span class="font-semibold">Avg. Package:</span> ₹${program.placements.average_package_lpa} LPA</p>
-                            <p><span class="font-semibold">Fees:</span> ₹${(program.fees.amount_inr / 100000).toFixed(2)} L</p>
-                            <p><span class="font-semibold">ROI:</span> <span class="font-bold ${roi > 4 ? 'text-green-600' : 'text-amber-600'}">${roi.toFixed(2)}x</span></p>
+                            <p><span class="font-semibold">Avg. Package:</span> ₹${college.avg_pkg_lpa} LPA</p>
+                            <p><span class="font-semibold">Fees:</span> ₹${college.fees_lakh.toFixed(2)} L</p>
+                            <p><span class="font-semibold">ROI:</span> <span class="font-bold ${roi > 4 ? 'text-green-600' : (roi > 1 ? 'text-amber-600' : 'text-red-600')}">${isFinite(roi) ? roi.toFixed(2) + 'x' : 'N/A'}</span></p>
                         </div>
                     </div>
                     <div class="mt-4 pt-3 border-t border-gray-200 text-right">
-                         <span class="text-blue-600 font-semibold hover:underline">View Details &rarr;</span>
+                        <span class="text-blue-600 font-semibold hover:underline text-sm">View Details &rarr;</span>
                     </div>
                 </div>
             `;
         };
         
         const renderModalContent = (college) => {
-            const program = college.programs[0];
-             const roi = (program.placements.average_package_lpa * 100000) / program.fees.amount_inr;
-
             return `
-                 <button id="close-modal" class="absolute top-4 right-4 text-gray-500 hover:text-gray-800 text-3xl">&times;</button>
-                 <div class="p-8">
-                     <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
-                         <div class="md:col-span-2">
-                             <h2 class="text-3xl font-bold text-[#A0522D]">${college.institute_name} (${college.acronym})</h2>
-                             <p class="text-md text-gray-600 mt-1">${college.location.city}, ${college.location.state} | Est. ${college.establishment_year}</p>
-                             <div class="mt-4 flex flex-wrap gap-2">
-                                ${college.accreditations.map(acc => `<span class="bg-green-100 text-green-800 text-xs font-medium mr-2 px-2.5 py-0.5 rounded-full">${acc}</span>`).join('')}
-                                ${college.nirf_ranking.map(rank => `<span class="bg-indigo-100 text-indigo-800 text-xs font-medium mr-2 px-2.5 py-0.5 rounded-full">NIRF #${rank.rank} (${rank.category} ${rank.year})</span>`).join('')}
-                             </div>
-                         </div>
-                         <div class="text-left md:text-right">
-                             <a href="${college.website}" target="_blank" class="inline-block bg-[#A0522D] text-white font-bold py-2 px-4 rounded-lg hover:bg-[#80421D] transition-colors">
-                                 Visit Website &rarr;
-                             </a>
-                         </div>
-                     </div>
-
-                     <div class="mt-6 border-t pt-6">
-                        <h3 class="text-xl font-semibold mb-3 text-gray-700">${program.degree_name} (${program.program_category})</h3>
-                        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-                             <div class="bg-[#F1E9DA] p-4 rounded-lg">
-                                 <h4 class="font-bold text-lg">Placements (${program.placements.year})</h4>
-                                 <ul class="mt-2 space-y-1 text-sm">
-                                     <li><span class="font-semibold">Average:</span> ₹${program.placements.average_package_lpa} LPA</li>
-                                     <li><span class="font-semibold">Highest:</span> ₹${program.placements.highest_package_lpa} LPA</li>
-                                     <li><span class="font-semibold">Median:</span> ₹${program.placements.median_package_lpa} LPA</li>
-                                 </ul>
-                             </div>
-                             <div class="bg-[#F1E9DA] p-4 rounded-lg">
-                                 <h4 class="font-bold text-lg">Admissions</h4>
-                                 <ul class="mt-2 space-y-1 text-sm">
-                                     <li><span class="font-semibold">Seat Intake:</span> ${program.admissions.seat_intake}</li>
-                                     ${program.admissions.entrance_exams.map(exam => `
-                                        <li><span class="font-semibold">${exam.exam_name} Cutoff:</span> ${exam.cutoff.map(c => `${c.value} ${c.unit}`).join(', ')}</li>
-                                     `).join('')}
-                                 </ul>
-                             </div>
-                             <div class="bg-[#F1E9DA] p-4 rounded-lg">
-                                 <h4 class="font-bold text-lg">Program Cost</h4>
-                                 <p class="text-3xl font-bold mt-2">₹${(program.fees.amount_inr / 100000).toFixed(2)} L</p>
-                                 <p class="text-sm text-gray-600">${program.fees.details || ''}</p>
-                             </div>
-                         </div>
-                     </div>
-                     
-                     <!-- AdSense Medium Rectangle Ad Slot in Modal -->
-                     <div class="my-6 border-t pt-6">
-                         <div class="ad-placeholder mx-auto" style="width: 300px; height: 250px;">
-                             <!-- Paste Google AdSense Medium Rectangle (300x250) code here -->
-                             Medium Rectangle Ad
-                         </div>
-                     </div>
-
-                     <div class="mt-6 border-t pt-6">
-                        <h4 class="font-bold text-lg mb-3 text-gray-700">Top Recruiters</h4>
-                        <div class="flex flex-wrap gap-2">
-                           ${program.placements.key_recruiters.map(rec => `<span class="bg-gray-200 text-gray-800 text-sm font-medium px-3 py-1 rounded-full">${rec}</span>`).join('')}
+                <button id="close-modal" class="absolute top-4 right-4 text-gray-500 hover:text-gray-800 text-3xl z-10">&times;</button>
+                <div class="p-6 sm:p-8">
+                    <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+                        <div class="md:col-span-2">
+                            <h2 class="text-2xl sm:text-3xl font-bold text-[#A0522D]">${college.institute_name}</h2>
+                            <p class="text-md text-gray-600 mt-1">${college.city}, ${college.state}</p>
+                            <div class="mt-4 flex flex-wrap gap-2">
+                                <span class="bg-blue-100 text-blue-800 text-xs font-medium mr-2 px-2.5 py-0.5 rounded-full">NIRF #${college.nirf_rank}</span>
+                                <span class="bg-yellow-100 text-yellow-800 text-xs font-medium mr-2 px-2.5 py-0.5 rounded-full">${college.ownership}</span>
+                            </div>
                         </div>
-                     </div>
-                 </div>
+                        <div class="text-left md:text-right">
+                            <a href="${college.website}" target="_blank" rel="noopener noreferrer" class="inline-block bg-[#A0522D] text-white font-bold py-2 px-4 rounded-lg hover:bg-[#80421D] transition-colors">
+                                Visit Website &rarr;
+                            </a>
+                        </div>
+                    </div>
+
+                    <div class="mt-6 border-t pt-6">
+                        <h3 class="text-xl font-semibold mb-3 text-gray-700">Program Details (${college.program_category})</h3>
+                        <div class="grid grid-cols-1 md:grid-cols-3 gap-6 text-center md:text-left">
+                            <div class="bg-[#F1E9DA] p-4 rounded-lg">
+                                <h4 class="font-bold text-lg">Avg. Placement</h4>
+                                <p class="text-3xl font-bold mt-2 text-[#A0522D]">₹${college.avg_pkg_lpa} LPA</p>
+                            </div>
+                             <div class="bg-[#F1E9DA] p-4 rounded-lg">
+                                <h4 class="font-bold text-lg">Program Cost</h4>
+                                <p class="text-3xl font-bold mt-2 text-[#A0522D]">₹${college.fees_lakh.toFixed(2)} L</p>
+                            </div>
+                            <div class="bg-[#F1E9DA] p-4 rounded-lg">
+                                <h4 class="font-bold text-lg">Key Exams</h4>
+                                <p class="text-md font-semibold mt-2 text-gray-800">${college.exams}</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
             `;
         };
-
-        const renderInfoPageContent = (page) => {
-            let title, content;
-            if (page === 'about') {
-                title = 'About Us';
-                content = `
-                    <p class="text-gray-700 leading-relaxed">
-                        Welcome to Apna College Explorer! Our mission is to empower students across India with clear, data-driven insights to choose the right college for their future.
-                    </p>
-                    <p class="mt-4 text-gray-700 leading-relaxed">
-                        We believe that a successful career starts with an informed decision. The process of selecting a college can be overwhelming, with countless options and confusing data. Our interactive tools are designed to simplify this complex world of college admissions, fees, and placements. By providing easy-to-understand visualizations like Return on Investment (ROI) and direct comparisons, we help you see which institutions offer the best value for your hard-earned money and future aspirations.
-                    </p>
-                    <p class="mt-4 text-gray-700 leading-relaxed">
-                        This platform is built for students, by people who understand the challenges of the admission process. We are committed to keeping our data up-to-date and relevant to give you the most accurate picture possible.
-                    </p>
-                `;
-            } else if (page === 'contact') {
-                title = 'Contact Us';
-                content = `
-                    <p class="text-gray-700 leading-relaxed">
-                        Have questions, suggestions, or want to partner with us? We would love to hear from you!
-                    </p>
-                    <p class="mt-4 text-gray-700 leading-relaxed">
-                        For any inquiries, feedback, or business proposals, please feel free to email us at:
-                    </p>
-                    <p class="mt-4 text-lg font-semibold text-[#A0522D]">
-                        contact.apnacollegeexplorer@gmail.com
-                    </p>
-                     <p class="mt-4 text-gray-700 leading-relaxed">
-                        We do our best to respond to all emails within 48 business hours.
-                    </p>
-                `;
-            } else if (page === 'privacy') {
-                title = 'Privacy Policy';
-                content = `
-                    <div class="text-sm text-gray-600 leading-relaxed space-y-3">
-                        <p>This Privacy Policy describes Our policies and procedures on the collection, use and disclosure of Your information when You use the Service and tells You about Your privacy rights and how the law protects You.</p>
-                        <h3 class="text-lg font-semibold text-gray-800 pt-2">Information Collection and Use</h3>
-                        <p>While using Our Service, We may ask You to provide Us with certain personally identifiable information that can be used to contact or identify You. Personally identifiable information may include, but is not limited to: Email address, First name and last name, Phone number, Usage Data.</p>
-                        <h3 class="text-lg font-semibold text-gray-800 pt-2">Log Files</h3>
-                        <p>Apna College Explorer follows a standard procedure of using log files. These files log visitors when they visit websites. All hosting companies do this and a part of hosting services' analytics. The information collected by log files include internet protocol (IP) addresses, browser type, Internet Service Provider (ISP), date and time stamp, referring/exit pages, and possibly the number of clicks. These are not linked to any information that is personally identifiable. The purpose of the information is for analyzing trends, administering the site, tracking users' movement on the website, and gathering demographic information.</p>
-                        <h3 class="text-lg font-semibold text-gray-800 pt-2">Cookies and Web Beacons</h3>
-                        <p>Like any other website, Apna College Explorer uses 'cookies'. These cookies are used to store information including visitors' preferences, and the pages on the website that the visitor accessed or visited. The information is used to optimize the users' experience by customizing our web page content based on visitors' browser type and/or other information.</p>
-                        <h3 class="text-lg font-semibold text-gray-800 pt-2">Google DoubleClick DART Cookie</h3>
-                        <p>Google is one of a third-party vendor on our site. It also uses cookies, known as DART cookies, to serve ads to our site visitors based upon their visit to www.website.com and other sites on the internet. However, visitors may choose to decline the use of DART cookies by visiting the Google ad and content network Privacy Policy at the following URL – <a href="https://policies.google.com/technologies/ads" target="_blank" class="text-blue-600 hover:underline">https://policies.google.com/technologies/ads</a></p>
-                        <h3 class="text-lg font-semibold text-gray-800 pt-2">Advertising Partners Privacy Policies</h3>
-                        <p>You may consult this list to find the Privacy Policy for each of the advertising partners of Apna College Explorer. Third-party ad servers or ad networks uses technologies like cookies, JavaScript, or Web Beacons that are used in their respective advertisements and links that appear on Apna College Explorer, which are sent directly to users' browser. They automatically receive your IP address when this occurs. These technologies are used to measure the effectiveness of their advertising campaigns and/or to personalize the advertising content that you see on websites that you visit.</p>
-                        <p>Note that Apna College Explorer has no access to or control over these cookies that are used by third-party advertisers.</p>
-                        <h3 class="text-lg font-semibold text-gray-800 pt-2">Consent</h3>
-                        <p>By using our website, you hereby consent to our Privacy Policy and agree to its terms.</p>
-                    </div>
-                `;
-            }
-
-            return `
-                 <button id="close-modal" class="absolute top-4 right-4 text-gray-500 hover:text-gray-800 text-3xl">&times;</button>
-                 <div class="p-8">
-                    <h2 class="text-3xl font-bold text-[#A0522D] mb-6">${title}</h2>
-                    <div class="prose max-w-none">
-                        ${content}
-                    </div>
-                 </div>
-            `;
-        }
         
         const createRoiChart = (data) => {
             const ctx = document.getElementById('roiChart').getContext('2d');
             const chartData = {
                 datasets: [{
                     label: 'Colleges',
-                    data: data.map(college => {
-                        const program = college.programs[0];
-                        return {
-                            x: program.fees.amount_inr,
-                            y: program.placements.average_package_lpa,
-                            roi: ((program.placements.average_package_lpa * 100000) / program.fees.amount_inr).toFixed(2) + 'x',
-                            name: college.acronym
-                        };
-                    }),
+                    data: data.map(college => ({
+                        x: college.fees_lakh,
+                        y: college.avg_pkg_lpa,
+                        roi: college.fees_lakh > 0 ? ((college.avg_pkg_lpa) / college.fees_lakh).toFixed(2) + 'x' : 'N/A',
+                        name: college.institute_name
+                    })),
                     backgroundColor: '#A0522D',
                     borderColor: '#A0522D',
-                    pointRadius: 8,
-                    pointHoverRadius: 12
+                    pointRadius: 6,
+                    pointHoverRadius: 10
                 }]
             };
 
@@ -480,15 +266,15 @@
                             callbacks: {
                                 label: function(context) {
                                     const d = context.raw;
-                                    return `${d.name}: ROI ${d.roi} (Fees: ₹${(d.x/100000).toFixed(1)}L, Pkg: ₹${d.y}LPA)`;
+                                    return `${d.name}: ROI ${d.roi} (Fees: ₹${d.x.toFixed(1)}L, Pkg: ₹${d.y}LPA)`;
                                 }
                             }
                         }
                     },
                     scales: {
                         x: {
-                            title: { display: true, text: 'Program Fees (in INR)', font: { weight: 'bold' } },
-                            ticks: { callback: value => `₹${(value / 100000)}L` }
+                            title: { display: true, text: 'Program Fees (Lakhs INR)', font: { weight: 'bold' } },
+                            ticks: { callback: value => `₹${value}` }
                         },
                         y: {
                             title: { display: true, text: 'Average Package (LPA)', font: { weight: 'bold' } },
@@ -501,9 +287,12 @@
 
         const createFeesVsPackageChart = (data) => {
             const ctx = document.getElementById('feesVsPackageChart').getContext('2d');
-            const labels = data.map(c => c.acronym);
-            const feesData = data.map(c => c.programs[0].fees.amount_inr / 100000);
-            const packageData = data.map(c => c.programs[0].placements.average_package_lpa);
+            
+            const limitedData = data.slice(0, 15);
+
+            const labels = limitedData.map(c => c.institute_name.length > 16 ? c.institute_name.substring(0, 15) + '...' : c.institute_name);
+            const feesData = limitedData.map(c => c.fees_lakh);
+            const packageData = limitedData.map(c => c.avg_pkg_lpa);
 
             const chartData = {
                 labels: labels,
@@ -544,8 +333,6 @@
                          x: {
                             ticks: {
                                 autoSkip: false,
-                                maxRotation: 45,
-                                minRotation: 45
                             }
                         }
                     }
@@ -553,57 +340,47 @@
             });
         };
 
-        const openModal = (content) => {
-            document.getElementById('modal-content').innerHTML = content;
-            const modal = document.getElementById('college-modal');
-            modal.classList.remove('hidden');
-            modal.classList.add('flex');
-            document.getElementById('close-modal').addEventListener('click', closeModal);
-        };
-
-        const closeModal = () => {
-            const modal = document.getElementById('college-modal');
-            modal.classList.add('hidden');
-            modal.classList.remove('flex');
-        };
-
         const updateDisplay = () => {
-            const filteredData = currentProgram === 'All'
-                ? collegeData
-                : collegeData.filter(c => c.programs[0].program_category === currentProgram);
+            const filteredData = collegeData.filter(c => {
+                const programMatch = currentProgram === 'All' || c.program_category === currentProgram;
+                const stateMatch = currentState === 'All' || c.state === currentState;
+                return programMatch && stateMatch;
+            });
             
-            const sortedData = [...filteredData].sort((a,b) => b.programs[0].placements.average_package_lpa - a.programs[0].placements.average_package_lpa);
+            const sortedData = [...filteredData].sort((a,b) => b.avg_pkg_lpa - a.avg_pkg_lpa);
 
             const collegeGrid = document.getElementById('college-grid');
-            
-            let contentHTML = '';
-            sortedData.forEach((college, index) => {
-                contentHTML += renderCollegeCard(college);
-                // Inject an in-feed ad placeholder after the 4th card
-                if (index === 3) {
-                    contentHTML += `
-                        <div class="college-card ad-placeholder flex flex-col justify-center items-center p-5">
-                            <!-- Paste Google AdSense In-Feed Ad code here -->
-                            In-Feed Ad
-                        </div>
-                    `;
-                }
-            });
-            collegeGrid.innerHTML = contentHTML;
+            collegeGrid.innerHTML = sortedData.length ? sortedData.map(renderCollegeCard).join('') : '<p class="text-center text-gray-500 col-span-full">No colleges match the selected criteria.</p>';
             
             createRoiChart(sortedData);
             createFeesVsPackageChart(sortedData);
             
             document.querySelectorAll('[data-college-id]').forEach(card => {
                 card.addEventListener('click', (e) => {
-                    const collegeId = e.currentTarget.dataset.collegeId;
-                    const college = collegeData.find(c => c.acronym === collegeId);
-                    openModal(renderModalContent(college));
+                    const collegeId = parseInt(e.currentTarget.dataset.collegeId, 10);
+                    const college = collegeData.find(c => c.id === collegeId);
+                    document.getElementById('modal-content').innerHTML = renderModalContent(college);
+                    const modal = document.getElementById('college-modal');
+                    modal.classList.remove('hidden');
+                    modal.classList.add('flex');
+                    document.getElementById('close-modal').addEventListener('click', () => {
+                        modal.classList.add('hidden');
+                        modal.classList.remove('flex');
+                    });
                 });
             });
         };
 
         document.addEventListener('DOMContentLoaded', () => {
+            const stateFilter = document.getElementById('state-filter');
+            const uniqueStates = [...new Set(collegeData.map(c => c.state))].sort();
+            uniqueStates.forEach(state => {
+                const option = document.createElement('option');
+                option.value = state;
+                option.textContent = state;
+                stateFilter.appendChild(option);
+            });
+
             updateDisplay();
 
             document.getElementById('program-filters').addEventListener('click', (e) => {
@@ -615,25 +392,17 @@
                 }
             });
 
-            document.getElementById('college-modal').addEventListener('click', (e) => {
+            stateFilter.addEventListener('change', (e) => {
+                currentState = e.target.value;
+                updateDisplay();
+            });
+
+            const modal = document.getElementById('college-modal');
+            modal.addEventListener('click', (e) => {
                 if (e.target.id === 'college-modal') {
-                    closeModal();
+                    modal.classList.add('hidden');
+                    modal.classList.remove('flex');
                 }
-            });
-
-            document.getElementById('about-link').addEventListener('click', (e) => {
-                e.preventDefault();
-                openModal(renderInfoPageContent('about'));
-            });
-
-            document.getElementById('contact-link').addEventListener('click', (e) => {
-                e.preventDefault();
-                openModal(renderInfoPageContent('contact'));
-            });
-
-            document.getElementById('privacy-link').addEventListener('click', (e) => {
-                e.preventDefault();
-                openModal(renderInfoPageContent('privacy'));
             });
         });
     </script>
